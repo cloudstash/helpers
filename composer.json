@@ -1,0 +1,21 @@
+{
+  "name": "cloudstash/helpers",
+  "description": "Helpers pack",
+  "authors": [
+    {
+      "name": "Viktor Kulikov",
+      "email": "bezdoom@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Cloudstash\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.4.*"
+  }
+}
