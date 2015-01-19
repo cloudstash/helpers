@@ -268,6 +268,46 @@ class Test_Helpers_Arr extends \TestCase
                 ]
             ], 'Bad assertion with put_in_single option (group [name])');
 
+        $result = \Cloudstash\Helper\Arr::grouping($this->getSources(), ['category']);
+        $this->assertTrue($result == [
+                'Test' => [
+                    [
+                        'id' => 1,
+                        'name' => 'One',
+                        'category' => 'Test'
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'Two',
+                        'category' => 'Test'
+                    ],
+                    [
+                        'id' => 6,
+                        'name' => 'Six',
+                        'category' => 'Test'
+                    ]
+                ],
+                'Stage' => [
+                    [
+                        'id' => 3,
+                        'name' => 'Three',
+                        'category' => 'Stage'
+                    ]
+                ],
+                'Stash' => [
+                    [
+                        'id' => 4,
+                        'name' => 'Four',
+                        'category' => 'Stash'
+                    ],
+                    [
+                        'id' => 5,
+                        'name' => 'Five',
+                        'category' => 'Stash'
+                    ],
+                ]
+            ], 'Bad assertion with disabled put_in_single option (group [category])');
+
         $result = \Cloudstash\Helper\Arr::grouping($this->getSources(), ['category', 'name'], true);
         $this->assertTrue($result == [
                 'Test' => [
