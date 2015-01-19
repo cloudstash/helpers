@@ -146,4 +146,166 @@ class Test_Helpers_Arr extends \TestCase
         $result = \Cloudstash\Helper\Arr::getLast([], 1000);
         $this->assertEquals($result, 1000, 'Wrong value for default value, if array is empty');
     }
+
+    /**
+     * @return array
+     */
+    protected function getSources()
+    {
+        return [
+            [
+                'id' => 1,
+                'name' => 'One',
+                'category' => 'Test'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Two',
+                'category' => 'Test'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Three',
+                'category' => 'Stage'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Four',
+                'category' => 'Stash'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Five',
+                'category' => 'Stash'
+            ],
+            [
+                'id' => 6,
+                'name' => 'Six',
+                'category' => 'Test'
+            ]
+        ];
+    }
+
+    public function testGrouping()
+    {
+        $result = \Cloudstash\Helper\Arr::grouping($this->getSources(), ['name']);
+        $this->assertTrue($result == [
+                'One' => [
+                    [
+                        'id' => 1,
+                        'name' => 'One',
+                        'category' => 'Test'
+                    ]
+                ],
+                'Two' => [
+                    [
+                        'id' => 2,
+                        'name' => 'Two',
+                        'category' => 'Test'
+                    ]
+                ],
+                'Three' => [
+                    [
+                        'id' => 3,
+                        'name' => 'Three',
+                        'category' => 'Stage'
+                    ]
+                ],
+                'Four' => [
+                    [
+                        'id' => 4,
+                        'name' => 'Four',
+                        'category' => 'Stash'
+                    ]
+                ],
+                'Five' => [
+                    [
+                        'id' => 5,
+                        'name' => 'Five',
+                        'category' => 'Stash'
+                    ]
+                ],
+                'Six' => [
+                    [
+                        'id' => 6,
+                        'name' => 'Six',
+                        'category' => 'Test'
+                    ]
+                ]
+            ], 'Bad assertion with disabled put_in_single option (group [name])');
+
+        $result = \Cloudstash\Helper\Arr::grouping($this->getSources(), ['name'], true);
+        $this->assertTrue($result == [
+                'One' => [
+                    'id' => 1,
+                    'name' => 'One',
+                    'category' => 'Test'
+                ],
+                'Two' => [
+                    'id' => 2,
+                    'name' => 'Two',
+                    'category' => 'Test'
+                ],
+                'Three' => [
+                    'id' => 3,
+                    'name' => 'Three',
+                    'category' => 'Stage'
+                ],
+                'Four' => [
+                    'id' => 4,
+                    'name' => 'Four',
+                    'category' => 'Stash'
+                ],
+                'Five' => [
+                    'id' => 5,
+                    'name' => 'Five',
+                    'category' => 'Stash'
+                ],
+                'Six' => [
+                    'id' => 6,
+                    'name' => 'Six',
+                    'category' => 'Test'
+                ]
+            ], 'Bad assertion with put_in_single option (group [name])');
+
+        $result = \Cloudstash\Helper\Arr::grouping($this->getSources(), ['category', 'name'], true);
+        $this->assertTrue($result == [
+                'Test' => [
+                    'One' => [
+                        'id' => 1,
+                        'name' => 'One',
+                        'category' => 'Test'
+                    ],
+                    'Two' => [
+                        'id' => 2,
+                        'name' => 'Two',
+                        'category' => 'Test'
+                    ],
+                    'Six' => [
+                        'id' => 6,
+                        'name' => 'Six',
+                        'category' => 'Test'
+                    ]
+                ],
+                'Stage' => [
+                    'Three' => [
+                        'id' => 3,
+                        'name' => 'Three',
+                        'category' => 'Stage'
+                    ]
+                ],
+                'Stash' => [
+                    'Four' => [
+                        'id' => 4,
+                        'name' => 'Four',
+                        'category' => 'Stash'
+                    ],
+                    'Five' => [
+                        'id' => 5,
+                        'name' => 'Five',
+                        'category' => 'Stash'
+                    ],
+                ]
+            ], 'Bad assertion with put_in_single option (group [category, name])');
+    }
 }
