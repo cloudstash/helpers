@@ -388,4 +388,70 @@ class Arr
 
         return array_combine($arr, $arr);
     }
+
+    /**
+     * @param array $flattenCollection
+     * @param string $node_delimiter
+     * @return array
+     *
+     * @example
+     *
+     * From array of flatten string like this:
+     * [
+     *      3944 => 'VI/Авто',
+     *      3945 => 'VI/Авто/Отечественные авто',
+     *      3946 => 'VI/Авто/Иномарки',
+     *      3947 => 'VI/Рынок/Фондовый',
+     *      3948 => 'AiData/Магазин/Книги',
+     *      3949 => 'AiData/Магазин/Колёса,Шины'
+     * ];
+     *
+     * make array of tree with scheme
+     * [
+     *     $frame => [
+     *          '__value' => key from flatten array, if last element
+     *          '__tree' => nested elements with equal scheme
+     *     ]
+     * ]
+     */
+    public static function flattenToTree(array $flattenCollection, $node_delimiter = '/')
+    {
+        $tree = [];
+
+        foreach ($flattenCollection as $value => $flatten) {
+            $flatten = trim($flatten);
+
+            if (empty($flatten) or $flatten == $node_delimiter) {
+                continue;
+            }
+
+            $frames = explode($node_delimiter, $flatten);
+            $size_frames = count($frames) - 1;
+
+            $node =& $tree;
+
+            foreach ($frames as $i => $frame) {
+                if (!isset($node[$frame])) {
+                    $node[$frame] = [];
+                }
+
+                $node =& $node[$frame];
+
+                if ($size_frames == $i) {
+                    $node['__value'] = $value;
+                    continue;
+                }
+
+                if ($size_frames > $i) {
+                    if (!isset($node['__tree'])) {
+                        $node['__tree'] = [];
+                    }
+                }
+
+                $node =& $node['__tree'];
+            }
+        }
+
+        return $tree;
+    }
 }

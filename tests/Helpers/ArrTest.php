@@ -17,6 +17,45 @@ class Test_Helpers_Arr extends \TestCase
         return $source;
     }
 
+    /**
+     * @return array
+     */
+    protected function getSources()
+    {
+        return [
+            [
+                'id' => 1,
+                'name' => 'One',
+                'category' => 'Test'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Two',
+                'category' => 'Test'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Three',
+                'category' => 'Stage'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Four',
+                'category' => 'Stash'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Five',
+                'category' => 'Stash'
+            ],
+            [
+                'id' => 6,
+                'name' => 'Six',
+                'category' => 'Test'
+            ]
+        ];
+    }
+
     public function testSimilar()
     {
         $nested = [
@@ -145,45 +184,6 @@ class Test_Helpers_Arr extends \TestCase
 
         $result = \Cloudstash\Helper\Arr::getLast([], 1000);
         $this->assertEquals($result, 1000, 'Wrong value for default value, if array is empty');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getSources()
-    {
-        return [
-            [
-                'id' => 1,
-                'name' => 'One',
-                'category' => 'Test'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Two',
-                'category' => 'Test'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Three',
-                'category' => 'Stage'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Four',
-                'category' => 'Stash'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Five',
-                'category' => 'Stash'
-            ],
-            [
-                'id' => 6,
-                'name' => 'Six',
-                'category' => 'Test'
-            ]
-        ];
     }
 
     public function testGrouping()
@@ -347,5 +347,60 @@ class Test_Helpers_Arr extends \TestCase
                     ],
                 ]
             ], 'Bad assertion with put_in_single option (group [category, name])');
+    }
+
+    public function testFlattenToTree()
+    {
+        $source = [
+            3944 => 'VI/Авто',
+            3945 => 'VI/Авто/Отечественные авто',
+            3946 => 'VI/Авто/Иномарки',
+            3947 => 'VI/Рынок/Фондовый',
+            3948 => 'AiData/Магазин/Книги',
+            3949 => 'AiData/Магазин/Колёса,Шины'
+        ];
+
+        $tree = \Cloudstash\Helper\Arr::flattenToTree($source, '/');
+
+        $wait = [
+            'VI' => [
+                '__tree' => [
+                    'Авто' => [
+                        '__value' => 3944,
+                        '__tree' => [
+                            'Отечественные авто' => [
+                                '__value' => 3945
+                            ],
+                            'Иномарки' => [
+                                '__value' => 3946
+                            ],
+                        ]
+                    ],
+                    'Рынок' => [
+                        '__tree' => [
+                            'Фондовый' => [
+                                '__value' => 3947
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'AiData' => [
+                '__tree' => [
+                    'Магазин' => [
+                        '__tree' => [
+                            'Книги' => [
+                                '__value' => 3948
+                            ],
+                            'Колёса,Шины' => [
+                                '__value' => 3949
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertTrue($tree == $wait, 'Bad flatten to tree');
     }
 }
