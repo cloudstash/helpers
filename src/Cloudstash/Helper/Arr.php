@@ -430,7 +430,11 @@ class Arr
 
             $node =& $tree;
 
-            foreach ($frames as $i => $frame) {
+            foreach (array_filter($frames) as $i => $frame) {
+                if (!$frame) {
+                    continue;
+                }
+                
                 if (!isset($node[$frame])) {
                     $node[$frame] = [];
                 }
