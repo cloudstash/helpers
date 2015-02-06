@@ -437,7 +437,7 @@ class Arr
 
     /**
      * @param array $flattenCollection
-     * @param string $node_delimiter
+     * @param string $nodeDelimiter
      * @return array
      *
      * @example
@@ -460,7 +460,7 @@ class Arr
      *     ]
      * ]
      */
-    public static function flattenToTree(array $flattenCollection, $node_delimiter = '/')
+    public static function flattenToTree(array $flattenCollection, $nodeDelimiter = '/')
     {
         $tree = [];
 
@@ -471,24 +471,24 @@ class Arr
                 continue;
             }
 
-            $_node_delimiter = $node_delimiter;
-            if (is_array($node_delimiter)) {
-                foreach ($node_delimiter as $_node_delimiter) {
-                    if (Str::Contains($_node_delimiter, $flatten)) {
+            $currentNodeDelimiter = $nodeDelimiter;
+            if (is_array($nodeDelimiter)) {
+                foreach ($nodeDelimiter as $currentNodeDelimiter) {
+                    if (Str::Contains($currentNodeDelimiter, $flatten)) {
                         break;
                     }
                 }
 
-                if (is_array($_node_delimiter)) {
-                    $_node_delimiter = static::getFirst($node_delimiter);
+                if (is_array($currentNodeDelimiter)) {
+                    $currentNodeDelimiter = static::getFirst($nodeDelimiter);
                 }
             }
 
-            if ($flatten == $_node_delimiter) {
+            if ($flatten == $currentNodeDelimiter) {
                 continue;
             }
 
-            $frames = explode($_node_delimiter, $flatten);
+            $frames = explode($currentNodeDelimiter, $flatten);
             $size_frames = count($frames) - 1;
 
             $node =& $tree;
