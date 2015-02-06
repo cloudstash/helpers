@@ -360,8 +360,6 @@ class Test_Helpers_Arr extends \TestCase
             3949 => 'AiData/Магазин/Колёса,Шины'
         ];
 
-        $tree = \Cloudstash\Helper\Arr::flattenToTree($source, '/');
-
         $wait = [
             'VI' => [
                 '__tree' => [
@@ -401,6 +399,61 @@ class Test_Helpers_Arr extends \TestCase
             ]
         ];
 
+        $tree = \Cloudstash\Helper\Arr::flattenToTree($source, '/');
         $this->assertTrue($tree == $wait, 'Bad flatten to tree');
+
+        $tree = \Cloudstash\Helper\Arr::flattenToTree($source, ['/']);
+        $this->assertTrue($tree == $wait, 'Bad flatten to tree from single array delimiters stack');
+
+        $source = [
+            3944 => 'VI/Авто',
+            3945 => 'VI/Авто/Отечественные авто',
+            3946 => 'VI/Авто/Иномарки',
+            3947 => 'VI_Рынок_Фондовый',
+            3948 => 'AiData/Магазин/Книги',
+            3949 => 'AiData/Магазин/Колёса_Шины'
+        ];
+
+        $wait = [
+            'VI' => [
+                '__tree' => [
+                    'Авто' => [
+                        '__value' => 3944,
+                        '__tree' => [
+                            'Отечественные авто' => [
+                                '__value' => 3945
+                            ],
+                            'Иномарки' => [
+                                '__value' => 3946
+                            ],
+                        ]
+                    ],
+                    'Рынок' => [
+                        '__tree' => [
+                            'Фондовый' => [
+                                '__value' => 3947
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'AiData' => [
+                '__tree' => [
+                    'Магазин' => [
+                        '__tree' => [
+                            'Книги' => [
+                                '__value' => 3948
+                            ],
+                            'Колёса_Шины' => [
+                                '__value' => 3949
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $tree = \Cloudstash\Helper\Arr::flattenToTree($source, ['/', '_']);
+        $this->assertTrue($tree == $wait, 'Bad flatten to tree from multiple array delimiters stack');
     }
 }

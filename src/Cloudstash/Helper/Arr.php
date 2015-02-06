@@ -323,11 +323,57 @@ class Arr
         $result = [];
 
         foreach ($source as $key => $value) {
-            $_key = self::get($value, $key_field);
-            $_value = self::get($value, $value_field);
+            $_key = Arr::get($value, $key_field);
 
             if (is_null($_key)) {
                 continue;
+            }
+
+            if (is_callable($value_field)) {
+                $_value = call_user_func_array($value_field, [$value]);
+            } else {
+                $_value = Arr::get($value, $value_field);
+            }
+
+            $result[$_key] = $_value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $source
+     * @param string $key_field
+     * @param array $map_values
+     * @return array
+     */
+    public static function toAssocOneToMany(array $source, $key_field, array $map_values = null)
+    {
+        $result = [];
+
+        foreach ($source as $key => $value) {
+            $_value = [];
+
+            $_key = Arr::get($value, $key_field);
+
+            if (is_null($_key)) {
+                continue;
+            }
+
+            if (is_null($map_values) or empty($map_values)) {
+                $_value = $value;
+            } else {
+                foreach ($map_values as $_map_key_name => $map_attribute_target) {
+                    $_map_value = Arr::get($value, $_map_key_name);
+
+                    if (is_array($map_attribute_target)) {
+                        foreach ($map_attribute_target as $attr_key => $attr_name) {
+                            $_value[$attr_name] = $_map_value;
+                        }
+                    } else {
+                        $_value[$map_attribute_target] = $_map_value;
+                    }
+                }
             }
 
             $result[$_key] = $_value;
@@ -421,11 +467,28 @@ class Arr
         foreach ($flattenCollection as $value => $flatten) {
             $flatten = trim($flatten);
 
-            if (empty($flatten) or $flatten == $node_delimiter) {
+            if (empty($flatten)) {
                 continue;
             }
 
-            $frames = explode($node_delimiter, $flatten);
+            $_node_delimiter = $node_delimiter;
+            if (is_array($node_delimiter)) {
+                foreach ($node_delimiter as $_node_delimiter) {
+                    if (Str::Contains($_node_delimiter, $flatten)) {
+                        break;
+                    }
+                }
+
+                if (is_array($_node_delimiter)) {
+                    $_node_delimiter = static::getFirst($node_delimiter);
+                }
+            }
+
+            if ($flatten == $_node_delimiter) {
+                continue;
+            }
+
+            $frames = explode($_node_delimiter, $flatten);
             $size_frames = count($frames) - 1;
 
             $node =& $tree;
@@ -434,7 +497,7 @@ class Arr
                 if (!$frame) {
                     continue;
                 }
-                
+
                 if (!isset($node[$frame])) {
                     $node[$frame] = [];
                 }
